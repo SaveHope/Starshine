@@ -108,24 +108,24 @@ _start:
 check_cpuid:
     WRITE msg_cpuid
 
-    ;   Pop EFLAGS to EAX and EBX
+    ;   Pop EFLAGS to EAX (for checking) and EBX (for restoring)
     pushfd
     pop eax
     mov ebx, eax
-    ;   Enabling 21 bit, and push EAX to EFLAGS
+    ;   Enabling ID flag, and push EAX to EFLAGS
     xor eax, 1 << 21
     push eax
     popfd
-    ;   Pop EFLAGS to EAX
+    ;   Pop EFLAGS to EAX. If ID flag resets, then CPU don't support CPUID
     pushfd
     pop eax
-    ;   Push EBX to EFLAGS
+    ;   Restore EFLAGS
     push ebx
     popfd
-    ;   if (eax != ebx) call Failed
-    xor eax, ebx
+    ;   if (eax != ebx) throw fail
+    cmp eax, ebx
     jz .fail
-
+    ;   Return
     WRITELINE msg_done
     ret
 .fail: 
