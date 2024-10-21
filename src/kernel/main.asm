@@ -138,7 +138,16 @@ check_cpuid:
 
 check_longmode:
     WRITE msg_longmode
-    jmp halt
+    mov eax, 0x80000000
+    cpuid
+    cmp eax, 0x80000001
+    jz .fail
+    ;   Return
+    WRITELINE msg_done
+    ret
+.fail: 
+    WRITELINE msg_failed
+    jmp failed
 
 
 
