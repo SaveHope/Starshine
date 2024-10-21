@@ -88,17 +88,17 @@ _start:
     ;   Setup stack
     mov esp, stack_top
 
+    ;   Boot begin message
     WRITELINE msg_bootbegin
     WRITELINE msg_empty
 
     ;   CPUID check
-    WRITE msg_cpuid
     call check_cpuid
 
     ;   Long mode
-    WRITE msg_longmode
     call check_longmode
 
+    ;   Enter into halt loop
     call halt
 
 
@@ -106,16 +106,23 @@ _start:
 ;   FUNCTION `check_cpuid`
 
 check_cpuid:
+    WRITE msg_cpuid
+
+    ;   Pop EFLAGS to EAX and EBX
     pushfd
     pop eax
     mov ebx, eax
+    ;   Enabling 21 bit, and push EAX to EFLAGS
     xor eax, 1 << 21
     push eax
     popfd
+    ;   Pop EFLAGS to EAX
     pushfd
     pop eax
+    ;   Push EBX to EFLAGS
     push ebx
     popfd
+    ;   if (eax != ebx) call Failed
     xor eax, ebx
     jz .fail
 
@@ -130,12 +137,12 @@ check_cpuid:
 ;   FUNCTION `check_longmode`
 
 check_longmode:
+    WRITE msg_longmode
     jmp halt
 
 
 
 ;   FUNCTION `failed`
-
 
 failed:
     WRITELINE msg_bootfault
@@ -144,7 +151,6 @@ failed:
 
 
 ;   FUNCTION `halt`
-
 
 halt:
     WRITELINE msg_halted
