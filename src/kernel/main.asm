@@ -62,7 +62,7 @@ stack_top:
 ;
 
 section .rodata
-msg_empty:     db ' ', 0
+msg_empty:     db VGA_TEXT,' ', 0
 msg_done:      db VGA_DONE,' DONE ',0
 msg_failed:    db VGA_FAIL,' FAILED ',0
 msg_halted:    db VGA_TEXT,'Halt loop entering',0

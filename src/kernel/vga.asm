@@ -43,23 +43,20 @@ bits 32
 ;   - ESI - Zero-ended string address
 
 vga_write:
+    pushad
     ;   Read position
     mov edi, 0xB8000
     add edi, [cursor_pos]
-
 .loop: 
     ;   Read char
     mov al, [esi]
-
     ;   if (al == '\0') break
     cmp al, 0
     jz .end
-
     ;   Check for colorcode
     ;   if (al == '\1')
     cmp al, 1
     jz .colorcode
-
     ;   Print char
     mov [edi], ax 
     inc esi
@@ -75,6 +72,7 @@ vga_write:
     ;   Write position
     sub edi, 0xB8000
     mov [cursor_pos], edi
+    popad
     ret
 
 
@@ -97,12 +95,12 @@ vga_writeline:
 ;   If char == 1, then loads next char as VGA color-code for next chars.
 
 vga_nextline:
+    pushad
     mov ax, [cursor_pos]
 .loop:
     ;   if (ax < VGA_WIDTH) break
     cmp ax, VGA_WIDTH
     jna .end
-
     ;   Calc cursor column
     sub ax, VGA_WIDTH
     jmp .loop
@@ -111,6 +109,7 @@ vga_nextline:
     mov bx, VGA_WIDTH
     sub bx, ax
     add [cursor_pos], bx
+    popad
     ;   Check buffer overflow
     ;   if (cursor_pos >= VGA_LENGTH) vga_scroll
     cmp [cursor_pos], word VGA_LENGTH
@@ -127,6 +126,7 @@ vga_nextline:
 ;   and moves cursor to last line.
 
 vga_scroll:
+    pushad
     mov ecx, 0
     mov edi, 0xB8000
     mov esi, 0xB8000 + VGA_WIDTH
@@ -134,10 +134,10 @@ vga_scroll:
     ;   if (cx == VGA_LENGTH - VGA_WIDTH - 1) break
     cmp ecx, VGA_LENGTH - VGA_WIDTH - 1
     jz .end
-
+    ;   Move char to past line
     mov ax, [esi]
     mov [edi], ax
-
+    ;   Increment registers
     inc ecx
     inc edi
     inc esi
@@ -147,11 +147,10 @@ vga_scroll:
 .loop2: ; Clear last line
     mov [edi], byte 0
     inc edi
-
     ;   until (edi < 0xB8000 + VGA_LENGTH)
     cmp edi, 0xB8000 + VGA_LENGTH
     jnz .loop2
-
     ;   Move cursor up
     sub [cursor_pos], word VGA_WIDTH
+    popad
     ret
