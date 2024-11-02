@@ -58,6 +58,8 @@ pub struct VGAWriter {
     row: usize,
     color: ColorByte,
     align: Align,
+    margin_left: usize,
+    margin_right: usize,
 }
 
 impl VGAWriter {
@@ -69,6 +71,8 @@ impl VGAWriter {
             row: 0,
             color: ColorByte::new(Color::Gray, Color::Black),
             align: Align::Left,
+            margin_left: 0,
+            margin_right: 0,
         }
     }
 
@@ -180,6 +184,12 @@ impl VGAWriter {
     pub fn at_row(&mut self, row: usize) -> &mut VGAWriter {
         self.row = row;
         self.column = 0;
+        self
+    }
+
+    pub fn margin(&mut self, left: usize, right: usize) -> &mut VGAWriter {
+        self.margin_left = left;
+        self.margin_right = right;
         self
     }
 }

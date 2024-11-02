@@ -18,8 +18,10 @@ fn panic(_info: &PanicInfo) -> ! {
         .align(vga::Align::Center)
         .print("Kernel panic!");
 
-    vga.at_row(6);
-    writeln!(vga, "{}", _info.message()).ok();
+    vga
+        .at_row(6)
+        .margin(4, 4);
+    writeln!(vga, "{}\n", _info.message()).ok();
     if _info.location().is_some() {
         writeln!(vga, "{}", _info.location().unwrap()).ok();
     }
