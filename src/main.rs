@@ -9,7 +9,8 @@ mod vga;
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     let mut vga = vga::VGAWriter::new();
-    vga.setcolor(vga::Color::White, vga::Color::Red);
+    vga.setcolor(vga::Color::White, vga::Color::Red)
+        .clear(0);
     write!(vga, "Kernel panic!\n\n{}", _info).ok();
     loop {}
 }

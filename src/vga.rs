@@ -74,13 +74,7 @@ impl VGAWriter {
                 self.buffer[i] = line;
             }
 
-            for i in 0..VGA_WIDTH {
-                self.buffer[VGA_HEIGHT-1][i] = Cell {
-                    symbol: 0,
-                    color: self.color,
-                }
-            }
-
+            self.clearline(0, VGA_HEIGHT-1);
             self.row -= 1;
         }
     }
@@ -131,6 +125,23 @@ impl VGAWriter {
 
         self.row = 26;
         self.write("E");
+    }
+
+    pub fn clearline(&mut self, symbol: u8, row: usize) {
+        for i in 0..VGA_WIDTH {
+            self.buffer[row][i] = Cell {
+                symbol,
+                color: self.color,
+            }
+        }
+    }
+
+    pub fn clear(&mut self, symbol: u8) {
+        for i in 0..VGA_HEIGHT {
+            self.clearline(symbol, i);
+        }
+        self.row = 0;
+        self.column = 0;
     }
 }
 
