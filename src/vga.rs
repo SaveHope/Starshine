@@ -1,5 +1,3 @@
-use core::fmt;
-
 const VGA_HEIGHT: usize = 25;
 const VGA_WIDTH: usize = 80;
 
@@ -49,6 +47,7 @@ pub struct VGAWriter {
 }
 
 impl VGAWriter {
+    #[allow(dead_code)]
     pub fn new() -> VGAWriter {
         VGAWriter {
             buffer: unsafe { &mut *(0xb8000 as *mut [[Cell; VGA_WIDTH]; VGA_HEIGHT]) },
@@ -58,6 +57,7 @@ impl VGAWriter {
         }
     }
 
+    #[allow(dead_code)]
     fn nextline(&mut self) {
         self.column = 0;
         self.row += 1;
@@ -79,6 +79,7 @@ impl VGAWriter {
         }
     }
 
+    #[allow(dead_code)]
     pub fn write(&mut self, string: &str) {
         for byte in string.bytes() {
             match byte {
@@ -98,6 +99,7 @@ impl VGAWriter {
         }
     }
 
+    #[allow(dead_code)]
     pub fn writeline(&mut self, string: &str) {
         self.write(string);
         self.nextline();
