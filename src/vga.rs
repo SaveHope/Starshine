@@ -1,7 +1,7 @@
 use core::fmt;
 
-const VGA_HEIGHT: usize = 25;
-const VGA_WIDTH: usize = 80;
+pub const VGA_HEIGHT: usize = 25;
+pub const VGA_WIDTH: usize = 80;
 
 #[allow(dead_code)]
 #[repr(u8)]
@@ -45,11 +45,19 @@ struct Cell {
     color: ColorByte,
 }
 
+#[allow(dead_code)]
+pub enum Align {
+    Left,
+    Center,
+    Right,
+}
+
 pub struct VGAWriter {
     buffer: &'static mut [[Cell; VGA_WIDTH]; VGA_HEIGHT],
     column: usize,
     row: usize,
     color: ColorByte,
+    align: Align,
 }
 
 impl VGAWriter {
@@ -60,6 +68,7 @@ impl VGAWriter {
             column: 0,
             row: 0,
             color: ColorByte::new(Color::Gray, Color::Black),
+            align: Align::Left,
         }
     }
 
@@ -88,11 +97,12 @@ impl VGAWriter {
                     if self.column >= VGA_WIDTH {
                         self.nextline();
                     }
-    
+                    
                     self.buffer[self.row][self.column] = Cell {
                         symbol: byte,
                         color: self.color,
                     };
+
                     self.column += 1;
                 }
             }
@@ -108,19 +118,19 @@ impl VGAWriter {
     }
 
     #[allow(dead_code)]
-    pub fn setcolor(&mut self, fg: Color, bg: Color) -> &mut VGAWriter {
+    pub fn color(&mut self, fg: Color, bg: Color) -> &mut VGAWriter {
         self.color = ColorByte::new(fg, bg);
         self
     }
 
     #[allow(dead_code)]
-    pub fn setcolor_u8(&mut self, fg: u8, bg: u8) -> &mut VGAWriter {
+    pub fn color_u8(&mut self, fg: u8, bg: u8) -> &mut VGAWriter {
         self.color = ColorByte::from_u8(fg, bg);
         self
     }
 
     pub fn throwpanic(&mut self) {
-        self.setcolor(Color::LightRed, Color::White)
+        self.color(Color::LightRed, Color::White)
             .write("AAAAAA!1! PANIC!!!11!!!1");
 
         self.row = 26;
@@ -142,6 +152,33 @@ impl VGAWriter {
             self.clearline(symbol, i);
         }
         self.row = 0;
+        self.column = 0;
+        self
+    }
+
+    pub fn print(&mut self, string: &str,) -> &mut VGAWriter {
+        self.column = match self.align {
+            Align::Left => self.column,
+            Align::Center => self.column - string.len() / 2,
+            Align::Right => self.column - string.len(),
+        };
+        self.write(string);
+        self
+    }
+
+    pub fn align(&mut self, align: Align) -> &mut VGAWriter {
+        self.align = align;
+        self
+    }
+
+    pub fn at(&mut self, column: usize, row: usize) -> &mut VGAWriter {
+        self.row = row;
+        self.column = column;
+        self
+    }
+
+    pub fn at_row(&mut self, row: usize) -> &mut VGAWriter {
+        self.row = row;
         self.column = 0;
         self
     }
