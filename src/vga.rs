@@ -127,21 +127,23 @@ impl VGAWriter {
         self.write("E");
     }
 
-    pub fn clearline(&mut self, symbol: u8, row: usize) {
+    pub fn clearline(&mut self, symbol: u8, row: usize) -> &mut VGAWriter {
         for i in 0..VGA_WIDTH {
             self.buffer[row][i] = Cell {
                 symbol,
                 color: self.color,
             }
         }
+        self
     }
 
-    pub fn clear(&mut self, symbol: u8) {
+    pub fn clear(&mut self, symbol: u8) -> &mut VGAWriter {
         for i in 0..VGA_HEIGHT {
             self.clearline(symbol, i);
         }
         self.row = 0;
         self.column = 0;
+        self
     }
 }
 
