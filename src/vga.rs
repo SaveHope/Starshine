@@ -80,7 +80,7 @@ impl VGAWriter {
     }
 
     #[allow(dead_code)]
-    pub fn write(&mut self, string: &str) {
+    pub fn write(&mut self, string: &str) -> &mut VGAWriter {
         for byte in string.bytes() {
             match byte {
                 b'\n' => self.nextline(),
@@ -97,11 +97,13 @@ impl VGAWriter {
                 }
             }
         }
+        self
     }
 
     #[allow(dead_code)]
-    pub fn writeline(&mut self, string: &str) {
+    pub fn writeline(&mut self, string: &str) -> &mut VGAWriter {
         self.write(string);
         self.nextline();
+        self
     }
 }
