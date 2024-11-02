@@ -14,9 +14,10 @@ fn panic(_info: &PanicInfo) -> ! {
 pub extern "C" fn _start() -> ! {
     vga::VGAWriter::new()
         .setcolor(vga::Color::Blue, vga::Color::Green)
-        .writeline("Hewwo!")
+        .writeline("\n\n\n\n\n\nHewwo!")
         .setcolor_u8(0xA, 0x8)
-        .writeline("Hewwo again!");
-
+        .writeline("Hewwo again!")
+        .throwpanic();
+    
     loop {}
 }

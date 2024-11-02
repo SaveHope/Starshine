@@ -1,3 +1,5 @@
+use core::fmt;
+
 const VGA_HEIGHT: usize = 25;
 const VGA_WIDTH: usize = 80;
 
@@ -121,5 +123,20 @@ impl VGAWriter {
     pub fn setcolor_u8(&mut self, fg: u8, bg: u8) -> &mut VGAWriter {
         self.color = ColorByte::from_u8(fg, bg);
         self
+    }
+
+    pub fn throwpanic(&mut self) {
+        self.setcolor(Color::LightRed, Color::White)
+            .write("AAAAAA!1! PANIC!!!11!!!1");
+
+        self.row = 26;
+        self.write("E");
+    }
+}
+
+impl fmt::Write for VGAWriter {
+    fn write_str(&mut self, string: &str) -> fmt::Result {
+        self.write(string);
+        Ok(())
     }
 }
