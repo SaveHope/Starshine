@@ -13,7 +13,10 @@ fn panic(_info: &PanicInfo) -> ! {
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     vga::VGAWriter::new()
-        .write("Hewwo!");
+        .setcolor(vga::Color::Blue, vga::Color::Green)
+        .writeline("Hewwo!")
+        .setcolor_u8(0xA, 0x8)
+        .writeline("Hewwo again!");
 
     loop {}
 }

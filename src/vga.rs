@@ -30,6 +30,10 @@ impl ColorByte {
     fn new(fg: Color, bg: Color) -> ColorByte {
         ColorByte((bg as u8) << 4 | (fg as u8))
     }
+
+    fn from_u8(fg: u8, bg: u8) -> ColorByte {
+        ColorByte(fg | bg << 4)
+    }
 }
 
 #[allow(dead_code)]
@@ -104,6 +108,18 @@ impl VGAWriter {
     pub fn writeline(&mut self, string: &str) -> &mut VGAWriter {
         self.write(string);
         self.nextline();
+        self
+    }
+
+    #[allow(dead_code)]
+    pub fn setcolor(&mut self, fg: Color, bg: Color) -> &mut VGAWriter {
+        self.color = ColorByte::new(fg, bg);
+        self
+    }
+
+    #[allow(dead_code)]
+    pub fn setcolor_u8(&mut self, fg: u8, bg: u8) -> &mut VGAWriter {
+        self.color = ColorByte::from_u8(fg, bg);
         self
     }
 }
