@@ -25,24 +25,25 @@ pub enum Color {
 }
 
 #[allow(dead_code)]
-#[derive(Clone, Copy)]
-struct ColorByte(u8);
+pub fn color_merge(fg: Color, bg: Color) -> u8 {
+    fg as u8 | (bg as u8) << 4
+}
 
-impl ColorByte {
-    fn new(fg: Color, bg: Color) -> ColorByte {
-        ColorByte((bg as u8) << 4 | (fg as u8))
-    }
+#[allow(dead_code)]
+pub fn color_merge_u8(fg: u8, bg: u8) -> u8 {
+    fg | bg << 4
+}
 
-    fn from_u8(fg: u8, bg: u8) -> ColorByte {
-        ColorByte(fg | bg << 4)
-    }
+#[allow(dead_code)]
+pub fn color_split(color: u8) -> (u8, u8) {
+    (color & 0b00001111, color >> 4)
 }
 
 #[allow(dead_code)]
 #[derive(Clone, Copy)]
 struct Cell {
     symbol: u8,
-    color: ColorByte,
+    color: u8,
 }
 
 #[allow(dead_code)]
@@ -56,7 +57,7 @@ pub struct VGAWriter {
     buffer: &'static mut [[Cell; VGA_WIDTH]; VGA_HEIGHT],
     column: usize,
     row: usize,
-    color: ColorByte,
+    color: u8,
     align: Align,
     margin_left: usize,
     margin_right: usize,
@@ -69,7 +70,7 @@ impl VGAWriter {
             buffer: unsafe { &mut *(0xb8000 as *mut [[Cell; VGA_WIDTH]; VGA_HEIGHT]) },
             column: 0,
             row: 0,
-            color: ColorByte::new(Color::Gray, Color::Black),
+            color: color_merge(Color::Gray, Color::Black),
             align: Align::Left,
             margin_left: 0,
             margin_right: 0,
@@ -98,7 +99,11 @@ impl VGAWriter {
             match byte {
                 b'\n' => self.nextline(),
                 _ => {
-                    if self.column >= VGA_WIDTH {
+                    if self.column < self.margin_left {
+                        self.column = self.margin_left;
+                    }
+
+                    if self.column >= VGA_WIDTH - self.margin_right {
                         self.nextline();
                     }
                     
@@ -123,13 +128,19 @@ impl VGAWriter {
 
     #[allow(dead_code)]
     pub fn color(&mut self, fg: Color, bg: Color) -> &mut VGAWriter {
-        self.color = ColorByte::new(fg, bg);
+        self.color = color_merge(fg, bg);
         self
     }
 
     #[allow(dead_code)]
     pub fn color_u8(&mut self, fg: u8, bg: u8) -> &mut VGAWriter {
-        self.color = ColorByte::from_u8(fg, bg);
+        self.color = color_merge_u8(fg, bg);
+        self
+    }
+
+    pub fn color_swap(&mut self) -> &mut VGAWriter {
+        let (fg, bg) = color_split(self.color);
+        self.color = color_merge_u8(bg, fg);
         self
     }
 

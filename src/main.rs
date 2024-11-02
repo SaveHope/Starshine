@@ -16,14 +16,16 @@ fn panic(_info: &PanicInfo) -> ! {
     vga
         .at(vga::VGA_WIDTH / 2, 2)
         .align(vga::Align::Center)
-        .print("Kernel panic!");
+        .color_swap()
+        .print(" KERNEL PANIC ")
+        .color_swap();
 
     vga
         .at_row(6)
         .margin(4, 4);
     writeln!(vga, "{}\n", _info.message()).ok();
     if _info.location().is_some() {
-        writeln!(vga, "{}", _info.location().unwrap()).ok();
+        writeln!(vga, "Source: {}", _info.location().unwrap()).ok();
     }
     
     loop {}
