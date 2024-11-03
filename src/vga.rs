@@ -144,14 +144,6 @@ impl VGAWriter {
         self
     }
 
-    pub fn throwpanic(&mut self) {
-        self.color(Color::LightRed, Color::White)
-            .write("AAAAAA!1! PANIC!!!11!!!1");
-
-        self.row = 26;
-        self.write("E");
-    }
-
     pub fn clearline(&mut self, symbol: u8, row: usize) -> &mut VGAWriter {
         for i in 0..VGA_WIDTH {
             self.buffer[row][i] = Cell {
