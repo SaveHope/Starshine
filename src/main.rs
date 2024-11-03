@@ -33,9 +33,26 @@ fn panic(_info: &PanicInfo) -> ! {
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    vga::VGAWriter::new()
-        .color(vga::Color::Blue, vga::Color::Green)
-        .writeline("\n\n\n\n\n\nHewwo!");
+    let mut kernel = Kernel::init();
+    kernel.main();
     
     loop {}
+}
+
+struct Kernel {
+    vga: vga::VGAWriter,
+}
+
+impl Kernel {
+    pub fn init() -> Kernel {
+        Kernel {
+            vga: vga::VGAWriter::new(),
+        }
+    }
+
+    pub fn main(&mut self) {
+        self.vga
+            .color(vga::Color::Blue, vga::Color::Green)
+            .writeline("\n\n\n\n\n\nHewwo!");
+    }
 }
